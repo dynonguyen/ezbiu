@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { updateMember } from '@/apis/supabase';
 import Button from '@/components/ui/Button.vue';
 import Flex from '@/components/ui/Flex.vue';
 import { useToast } from '@/hooks/useToast';
@@ -9,10 +8,11 @@ import { buildVietQRData, buildVietQRUrl } from '@/utils/vietqr';
 import { useMutation } from '@tanstack/vue-query';
 import to from 'await-to-js';
 import { ref, watch } from 'vue';
+import { useApiClient } from '../../../hooks/useApiClient';
 import BankInfoDetail from '../BankInfoDetail.vue';
 import BankInfoPopup from '../BankInfoPopup.vue';
 import { useGroupContext } from '../hooks/useGroupContext';
-import { useGroupQueryControl } from '../hooks/useRealtimeChannel';
+import { useGroupQueryControl } from '../hooks/useGroupQueryControl';
 
 const props = defineProps<{
 	bankInfo?: MemberBankInfo;
@@ -24,7 +24,8 @@ const props = defineProps<{
 const qrBase64 = ref('');
 const open = ref(false);
 
-const { mutateAsync: updateMutateAsync } = useMutation({ mutationFn: updateMember });
+const client = useApiClient();
+const { mutateAsync: updateMutateAsync } = useMutation({ mutationFn: client.updateMember });
 const toast = useToast();
 const { group } = useGroupContext();
 const { refetchGroup } = useGroupQueryControl();

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { removeMember } from '@/apis/supabase';
 import MemberAvatar from '@/components/MemberAvatar.vue';
 import Flex from '@/components/ui/Flex.vue';
 import Typography from '@/components/ui/Typography.vue';
@@ -8,17 +7,19 @@ import type { Member } from '@/types/entities';
 import { useMutation } from '@tanstack/vue-query';
 import to from 'await-to-js';
 import { computed, ref } from 'vue';
+import { useApiClient } from '../../../hooks/useApiClient';
 import { useBillsContext } from '../hooks/useBillsContext';
 import { useGroupContext } from '../hooks/useGroupContext';
-import { useGroupQueryControl } from '../hooks/useRealtimeChannel';
+import { useGroupQueryControl } from '../hooks/useGroupQueryControl';
 import AccountingIcon from './AccountingIcon.vue';
 import MemberEditingForm from './MemberEditingPopup.vue';
 
+const client = useApiClient();
 const props = defineProps<{ member: Member; index: number }>();
 const { group, isAccountantMode } = useGroupContext();
 const bills = useBillsContext();
 const { mutateAsync: removeMutateAsync, isPending: isRemoving } = useMutation({
-	mutationFn: removeMember,
+	mutationFn: client.removeMember,
 });
 
 const toast = useToast();

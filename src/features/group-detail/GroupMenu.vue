@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { createErrorLog, deleteGroup, updateGroup } from '@/apis/supabase';
 import InviteLink from '@/components/InviteLink.vue';
 import Button from '@/components/ui/Button.vue';
 import Dialog from '@/components/ui/Dialog.vue';
@@ -14,11 +13,13 @@ import { onClickOutside } from '@vueuse/core';
 import to from 'await-to-js';
 import { ref, useId, useTemplateRef } from 'vue';
 import { useRouter } from 'vue-router';
+import { useApiClient } from '../../hooks/useApiClient';
 import GroupForm from '../new-group/GroupForm.vue';
 import { useBillsContext } from './hooks/useBillsContext';
 import { useGroupContext } from './hooks/useGroupContext';
-import { useGroupQueryControl } from './hooks/useRealtimeChannel';
+import { useGroupQueryControl } from './hooks/useGroupQueryControl';
 
+const client = useApiClient();
 const { group } = useGroupContext();
 const bills = useBillsContext();
 const toast = useToast();
@@ -28,10 +29,10 @@ const localDBStore = useLocalDBStore();
 const outsideClickTarget = useTemplateRef('menu-target');
 
 const { isPending: isUpdating, mutateAsync: updateMutateAsync } = useMutation({
-	mutationFn: updateGroup,
+	mutationFn: client.updateGroup,
 });
 const { isPending: isDeleting, mutateAsync: deleteMutateAsync } = useMutation({
-	mutationFn: deleteGroup,
+	mutationFn: client.deleteGroup,
 });
 const { refetchGroup } = useGroupQueryControl();
 
@@ -54,7 +55,7 @@ const handleEditGroup = async (form: Partial<Group>) => {
 	const [error] = await to(updateMutateAsync({ updated: form, id: group.value.id }));
 
 	if (error) {
-		void createErrorLog({ error: error?.message });
+		void client.createErrorLog({ error: error?.message });
 		return toast.errorWithRetry('Chỉnh sửa thất bại', () => handleEditGroup(form));
 	}
 
@@ -68,7 +69,7 @@ const handleDeleteGroup = async () => {
 	localDBStore.unhideRecentGroup(group.value.id);
 
 	if (error) {
-		void createErrorLog({ error: error?.message });
+		void client.createErrorLog({ error: error?.message });
 		return toast.errorWithRetry('Xoá nhóm thất bại', () => handleDeleteGroup());
 	}
 

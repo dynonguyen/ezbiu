@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { updateMember } from '@/apis/supabase';
 import Button from '@/components/ui/Button.vue';
 import Dialog from '@/components/ui/Dialog.vue';
 import Flex from '@/components/ui/Flex.vue';
@@ -7,18 +6,20 @@ import { useToast } from '@/hooks/useToast';
 import type { Member } from '@/types/entities';
 import { useMutation } from '@tanstack/vue-query';
 import to from 'await-to-js';
+import { useApiClient } from '../../../hooks/useApiClient';
 import { useGroupContext } from '../hooks/useGroupContext';
-import { useGroupQueryControl } from '../hooks/useRealtimeChannel';
+import { useGroupQueryControl } from '../hooks/useGroupQueryControl';
 import type { MemberFormData } from './MemberForm.vue';
 import MemberForm from './MemberForm.vue';
 
 const props = defineProps<{ member: Member }>();
 const open = defineModel('open', { default: false });
 
+const client = useApiClient();
 const { group } = useGroupContext();
 
 const { mutateAsync: updateMutateAsync, isPending: isUpdating } = useMutation({
-	mutationFn: updateMember,
+	mutationFn: client.updateMember,
 });
 
 const toast = useToast();

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { addMember } from '@/apis/supabase';
 import Button from '@/components/ui/Button.vue';
 import Dialog from '@/components/ui/Dialog.vue';
 import Flex from '@/components/ui/Flex.vue';
@@ -9,15 +8,17 @@ import { generateUUID } from '@/utils/helpers';
 import { useMutation } from '@tanstack/vue-query';
 import to from 'await-to-js';
 import { ref } from 'vue';
+import { useApiClient } from '../../../hooks/useApiClient';
 import { useGroupContext } from '../hooks/useGroupContext';
-import { useGroupQueryControl } from '../hooks/useRealtimeChannel';
+import { useGroupQueryControl } from '../hooks/useGroupQueryControl';
 import MemberForm, { type MemberFormData } from './MemberForm.vue';
 
 const open = ref(false);
 
+const client = useApiClient();
 const { group } = useGroupContext();
 const toast = useToast();
-const { isPending, mutateAsync } = useMutation({ mutationFn: addMember });
+const { isPending, mutateAsync } = useMutation({ mutationFn: client.addMember });
 const { refetchGroup } = useGroupQueryControl();
 
 const handleAddMember = async (form: MemberFormData) => {
