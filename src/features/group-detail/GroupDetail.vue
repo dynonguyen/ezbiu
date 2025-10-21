@@ -61,7 +61,7 @@ onMounted(() => {
 
 onUnmounted(() => {
 	document.getElementById('app-layout')?.classList.add('h-dvh');
-	realtimeClient.value?.channel.unsubscribe();
+	realtimeClient.value?.channel?.unsubscribe();
 });
 </script>
 
