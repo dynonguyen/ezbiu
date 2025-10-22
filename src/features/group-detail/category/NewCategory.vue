@@ -1,18 +1,19 @@
 <script setup lang="ts">
-import { createErrorLog, updateGroup } from '@/apis/supabase';
 import { useToast } from '@/hooks/useToast';
 import type { Category } from '@/types/entities';
 import { generateUUID } from '@/utils/helpers';
 import { useMutation } from '@tanstack/vue-query';
 import to from 'await-to-js';
 import { ref } from 'vue';
+import { useApiClient } from '../../../hooks/useApiClient';
 import { useGroupContext } from '../hooks/useGroupContext';
-import { useGroupQueryControl } from '../hooks/useRealtimeChannel';
+import { useGroupQueryControl } from '../hooks/useGroupQueryControl';
 import CategoryForm, { type CategoryFormData, type ExposedCategoryForm } from './CategoryForm.vue';
 
+const client = useApiClient();
 const { group } = useGroupContext();
 const { isPending: isUpdating, mutateAsync: updateMutateAsync } = useMutation({
-	mutationFn: updateGroup,
+	mutationFn: client.updateGroup,
 });
 const { refetchGroup } = useGroupQueryControl();
 const toast = useToast();
@@ -33,7 +34,7 @@ const handleAddNewCategory = async (form: CategoryFormData) => {
 	);
 
 	if (error) {
-		void createErrorLog({ error: error?.message });
+		void client.createErrorLog({ error: error?.message });
 		return toast.errorWithRetry('Chỉnh sửa thất bại', () => handleAddNewCategory(form));
 	}
 

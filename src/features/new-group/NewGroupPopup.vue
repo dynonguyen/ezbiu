@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { createErrorLog, createGroup, importGroup } from '@/apis/supabase';
 import InviteLink from '@/components/InviteLink.vue';
 import Loading from '@/components/Loading.vue';
 import Button from '@/components/ui/Button.vue';
 import Dialog from '@/components/ui/Dialog.vue';
 import Flex from '@/components/ui/Flex.vue';
 import { PATH } from '@/constants/path';
+import { useApiClient } from '@/hooks/useApiClient';
 import { useToast } from '@/hooks/useToast';
 import { useLocalDBStore } from '@/stores/local-db';
 import { PaymentTrackingMode, type Group } from '@/types/entities';
@@ -20,8 +20,9 @@ import ImportBackupFile, { type ImportedModel } from './ImportBackupFile.vue';
 const open = defineModel<boolean>({ default: false });
 const inviteGroupId = ref('');
 
-const createGroupMutation = useMutation({ mutationFn: createGroup });
-const importGroupMutation = useMutation({ mutationFn: importGroup });
+const client = useApiClient();
+const createGroupMutation = useMutation({ mutationFn: client.createGroup });
+const importGroupMutation = useMutation({ mutationFn: client.importGroup });
 
 const toast = useToast();
 const router = useRouter();
@@ -48,7 +49,7 @@ const handleAddGroup = async (form: Pick<Group, 'name' | 'paymentTrackingMode'>)
 	const [error] = await to(mutationAction);
 
 	if (error) {
-		void createErrorLog({ error: error?.message });
+		void client.createErrorLog({ error: error?.message });
 		return toast.errorWithRetry('Tạo nhóm thất bại', () => {
 			handleAddGroup(form);
 		});

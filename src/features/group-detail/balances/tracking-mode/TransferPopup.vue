@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { createErrorLog, markBillsAsPaid } from '@/apis/supabase';
 import Button from '@/components/ui/Button.vue';
 import Dialog from '@/components/ui/Dialog.vue';
 import Flex from '@/components/ui/Flex.vue';
@@ -10,18 +9,20 @@ import { toVND } from '@/utils/helpers';
 import { useMutation } from '@tanstack/vue-query';
 import to from 'await-to-js';
 import { computed, ref } from 'vue';
+import { useApiClient } from '../../../../hooks/useApiClient';
 import BillItem from '../../bills/BillItem.vue';
 import { isMemberPaid } from '../../helpers/utils';
 import { useBillsContext } from '../../hooks/useBillsContext';
 import { useGroupContext } from '../../hooks/useGroupContext';
-import { useGroupQueryControl } from '../../hooks/useRealtimeChannel';
+import { useGroupQueryControl } from '../../hooks/useGroupQueryControl';
 import BankQR from '../BankQR.vue';
 
 const memberId = defineModel<string>('memberId', { default: '' });
 
+const client = useApiClient();
 const bills = useBillsContext();
 const toast = useToast();
-const { isPending: updating, mutateAsync } = useMutation({ mutationFn: markBillsAsPaid });
+const { isPending: updating, mutateAsync } = useMutation({ mutationFn: client.markBillsAsPaid });
 const { refetchBills } = useGroupQueryControl();
 const { group } = useGroupContext();
 
@@ -98,7 +99,7 @@ const handleMarkAsPaid = async () => {
 	);
 
 	if (error) {
-		void createErrorLog({ error: error?.message });
+		void client.createErrorLog({ error: error?.message });
 		return toast.errorWithRetry('Cập nhật thất bại', () => handleMarkAsPaid());
 	}
 

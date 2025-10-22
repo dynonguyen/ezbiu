@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { deleteCategory, updateGroup } from '@/apis/supabase';
 import Button from '@/components/ui/Button.vue';
 import Dialog from '@/components/ui/Dialog.vue';
 import Flex from '@/components/ui/Flex.vue';
@@ -9,11 +8,13 @@ import type { Category } from '@/types/entities';
 import { useMutation } from '@tanstack/vue-query';
 import to from 'await-to-js';
 import { ref } from 'vue';
+import { useApiClient } from '../../../hooks/useApiClient';
 import { useGroupContext } from '../hooks/useGroupContext';
-import { useGroupQueryControl } from '../hooks/useRealtimeChannel';
+import { useGroupQueryControl } from '../hooks/useGroupQueryControl';
 import type { CategoryFormData } from './CategoryForm.vue';
 import CategoryForm from './CategoryForm.vue';
 
+const client = useApiClient();
 const props = withDefaults(
 	defineProps<{ category: Category; billCount?: number; editable?: boolean }>(),
 	{ editable: false },
@@ -22,10 +23,10 @@ const emit = defineEmits<{ click: [] }>();
 
 const { group } = useGroupContext();
 const { isPending: isUpdating, mutateAsync: updateGroupAsync } = useMutation({
-	mutationFn: updateGroup,
+	mutationFn: client.updateGroup,
 });
 const { isPending: isDeleting, mutateAsync: deleteCategoryAsync } = useMutation({
-	mutationFn: deleteCategory,
+	mutationFn: client.deleteCategory,
 });
 const { refetchGroup, refetchBills } = useGroupQueryControl();
 const toast = useToast();

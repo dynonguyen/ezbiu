@@ -18,6 +18,7 @@ export const CONTEXT_KEY = {
 	BILLS: 'bills',
 	REALTIME_CLIENT: 'realtime-client',
 	BILL_FORM: 'bill-form',
+	API_CLIENT: 'api-client',
 };
 
 export const QUERY_KEY = {

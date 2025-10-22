@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { fetchGroups } from '@/apis/supabase';
 import Button from '@/components/ui/Button.vue';
 import Flex from '@/components/ui/Flex.vue';
 import Typography from '@/components/ui/Typography.vue';
 import { LS_KEY, QUERY_KEY } from '@/constants/key';
+import { useApiClient } from '@/hooks/useApiClient';
 import { useLocalDBStore } from '@/stores/local-db';
 import type { Group } from '@/types/entities';
 import { getImgUrl } from '@/utils/get-asset';
@@ -13,6 +13,7 @@ import { computed, ref, toRaw, watch } from 'vue';
 import RecentGroupItem from './RecentGroupItem.vue';
 import Sorting, { sortOptions } from './Sorting.vue';
 
+const client = useApiClient();
 const localStoreDB = useLocalDBStore();
 const showHidden = ref(Boolean(localStorage.getItem(LS_KEY.SHOW_HIDDEN_GROUPS)));
 
@@ -22,7 +23,7 @@ const hasHiddenGroups = computed(() => localStoreDB.hiddenGroups.length > 0);
 
 const { isPending, data, isError } = useQuery({
 	queryKey,
-	queryFn: () => fetchGroups(groupIds.value),
+	queryFn: () => client.fetchGroups(groupIds.value),
 });
 
 const sortOpt = ref(

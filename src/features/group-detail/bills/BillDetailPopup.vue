@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { createErrorLog, updateBill } from '@/apis/supabase';
 import Button from '@/components/ui/Button.vue';
 import Dialog from '@/components/ui/Dialog.vue';
 import { useToast } from '@/hooks/useToast';
@@ -7,9 +6,10 @@ import type { Bill, BillId } from '@/types/entities';
 import { useMutation } from '@tanstack/vue-query';
 import to from 'await-to-js';
 import { computed, ref } from 'vue';
+import { useApiClient } from '../../../hooks/useApiClient';
 import { useBillsContext } from '../hooks/useBillsContext';
 import { useGroupContext } from '../hooks/useGroupContext';
-import { useGroupQueryControl } from '../hooks/useRealtimeChannel';
+import { useGroupQueryControl } from '../hooks/useGroupQueryControl';
 import BillForm from './BillForm.vue';
 import ReadonlyBillDetail from './ReadonlyBillDetail.vue';
 
@@ -17,8 +17,9 @@ const bills = useBillsContext();
 const toast = useToast();
 const { isAccountantMode } = useGroupContext();
 
+const client = useApiClient();
 const { isPending: isUpdating, mutateAsync: updateMutateAsync } = useMutation({
-	mutationFn: updateBill,
+	mutationFn: client.updateBill,
 });
 const { refetchBills } = useGroupQueryControl();
 
@@ -35,7 +36,7 @@ const handleUpdateBill = async (form: Omit<Bill, 'id' | 'createdAt'>) => {
 	const [error] = await to(updateMutateAsync({ id: detailId.value, ...form }));
 
 	if (error) {
-		void createErrorLog({ error: error?.message });
+		void client.createErrorLog({ error: error?.message });
 		return toast.errorWithRetry('Chỉnh sửa bill thất bại', () => handleUpdateBill(form));
 	}
 

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { fetchBills } from '@/apis/supabase';
 import CurrencyText from '@/components/CurrencyText.vue';
 import Loading from '@/components/Loading.vue';
 import Button from '@/components/ui/Button.vue';
@@ -13,6 +12,7 @@ import { usePageTitle } from '@/hooks/usePageTitle';
 import { useQuery } from '@tanstack/vue-query';
 import { computed, nextTick, onUnmounted, provide, ref, watch } from 'vue';
 import { RouterLink, useRouter } from 'vue-router';
+import { useApiClient } from '../../hooks/useApiClient';
 import PaymentTrackingHelper from '../new-group/PaymentTrackingHelper.vue';
 import BalanceList from './balances/BalanceList.vue';
 import BillList from './bills/BillList.vue';
@@ -26,13 +26,14 @@ type BillTabValue = 'bills' | 'balances';
 const { group } = useGroupContext();
 const router = useRouter();
 
+const client = useApiClient();
 const {
 	data: bills,
 	isPending,
 	error,
 } = useQuery({
 	queryKey: [QUERY_KEY.BILL_LIST, group.value.id],
-	queryFn: () => fetchBills(group.value.id),
+	queryFn: () => client.fetchBills(group.value.id),
 });
 
 const openNewBill = ref(false);

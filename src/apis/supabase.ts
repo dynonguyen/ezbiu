@@ -7,14 +7,16 @@ import dayjs from 'dayjs';
 import { omit } from 'es-toolkit';
 import type { Bill, BillId, CategoryId, Group, GroupId, Member, MemberId } from '../types/entities';
 import { getEnv } from '../utils/get-env';
+import type { IApiClient } from './api-client';
+import type { IRealtimeClient, RealtimeChannel } from './realtime-client';
 
-export const supabase = createClient(getEnv('VITE_SUPABASE_URL'), getEnv('VITE_SUPABASE_KEY'));
+const supabase = createClient(getEnv('VITE_SUPABASE_URL'), getEnv('VITE_SUPABASE_KEY'));
 
 const getGroupView = (groupId: GroupId) => `group_${groupId}`;
 const getBillView = (groupId: GroupId) => `bill_${groupId}`;
 
 // Group
-export const createGroup = async (
+const createGroup = async (
 	group: Pick<Group, 'name' | 'id' | 'paymentTrackingMode'> & Partial<Group>,
 ) => {
 	const gData = await supabase.from('groups').insert(group);
@@ -27,7 +29,7 @@ export const createGroup = async (
 	if (bvData.error) throw bvData.error;
 };
 
-export const fetchGroup = async (id: string): Promise<Group> => {
+const fetchGroup = async (id: GroupId): Promise<Group> => {
 	const { data, error } = await supabase
 		.from(getGroupView(id))
 		.select()
@@ -47,7 +49,7 @@ const updateGroupUpdatedAt = async (id: GroupId, updatedAt?: Date) => {
 	if (resp.error) throw resp.error;
 };
 
-export const updateGroup = async (data: { id: string; updated: Partial<Group> }) => {
+const updateGroup = async (data: { id: GroupId; updated: Partial<Group> }) => {
 	const { id, updated } = data;
 
 	const resp = await supabase.from(getGroupView(id)).update(updated).eq('id', id);
@@ -57,12 +59,12 @@ export const updateGroup = async (data: { id: string; updated: Partial<Group> })
 	void updateGroupUpdatedAt(id);
 };
 
-export const deleteGroup = async (id: GroupId) => {
+const deleteGroup = async (id: GroupId) => {
 	const resp = await supabase.from(getGroupView(id)).update({ deleted: true }).eq('id', id);
 	if (resp.error) throw resp.error;
 };
 
-export const fetchGroups = async (
+const fetchGroups = async (
 	ids: GroupId[],
 ): Promise<{
 	groups: Group[];
@@ -89,7 +91,7 @@ export const fetchGroups = async (
 };
 
 // Member
-export const addMember = async (data: { groupId: GroupId; member: Member }) => {
+const addMember = async (data: { groupId: GroupId; member: Member }) => {
 	const { groupId, member } = data;
 
 	const [error, currentGroup] = await to(fetchGroup(groupId));
@@ -119,7 +121,7 @@ export const addMember = async (data: { groupId: GroupId; member: Member }) => {
 	void updateGroupUpdatedAt(groupId);
 };
 
-export const removeMember = async (data: { groupId: GroupId; memberId: MemberId }) => {
+const removeMember = async (data: { groupId: GroupId; memberId: MemberId }) => {
 	const { groupId, memberId } = data;
 
 	const [gError, group] = await to(fetchGroup(groupId));
@@ -147,7 +149,7 @@ export const removeMember = async (data: { groupId: GroupId; memberId: MemberId 
 	void updateGroupUpdatedAt(groupId);
 };
 
-export const updateMember = async (data: { groupId: GroupId; newValue: Member }) => {
+const updateMember = async (data: { groupId: GroupId; newValue: Member }) => {
 	const { groupId, newValue } = data;
 
 	const [error, group] = await to(fetchGroup(groupId));
@@ -186,7 +188,7 @@ const isAmountValid = (bill: Partial<Bill>) => {
 	return true;
 };
 
-export const fetchBills = async (groupId: GroupId): Promise<Bill[]> => {
+const fetchBills = async (groupId: GroupId): Promise<Bill[]> => {
 	const { data, error } = await supabase.from(getBillView(groupId)).select();
 
 	if (error) throw error;
@@ -194,7 +196,7 @@ export const fetchBills = async (groupId: GroupId): Promise<Bill[]> => {
 	return data as Bill[];
 };
 
-export const createBill = async (bill: Omit<Bill, 'id' | 'createdAt'>) => {
+const createBill = async (bill: Omit<Bill, 'id' | 'createdAt'>) => {
 	if (isAmountValid(bill)) {
 		const resp = await supabase.from(getBillView(bill.groupId)).insert(bill);
 
@@ -204,7 +206,7 @@ export const createBill = async (bill: Omit<Bill, 'id' | 'createdAt'>) => {
 	}
 };
 
-export const updateBill = async (updated: Omit<Bill, 'createdAt'>) => {
+const updateBill = async (updated: Omit<Bill, 'createdAt'>) => {
 	if (isAmountValid(updated)) {
 		const resp = await supabase
 			.from(getBillView(updated.groupId))
@@ -217,7 +219,7 @@ export const updateBill = async (updated: Omit<Bill, 'createdAt'>) => {
 	}
 };
 
-export const deleteBill = async (data: { groupId: GroupId; billId: BillId }) => {
+const deleteBill = async (data: { groupId: GroupId; billId: BillId }) => {
 	const { groupId, billId } = data;
 
 	const resp = await supabase.from(getBillView(groupId)).delete().eq('id', billId);
@@ -227,7 +229,7 @@ export const deleteBill = async (data: { groupId: GroupId; billId: BillId }) => 
 	void updateGroupUpdatedAt(groupId);
 };
 
-export const markBillsAsPaid = async (data: {
+const markBillsAsPaid = async (data: {
 	groupId: GroupId;
 	memberId: MemberId;
 	billIds: BillId[];
@@ -247,7 +249,7 @@ export const markBillsAsPaid = async (data: {
 	void updateGroupUpdatedAt(groupId);
 };
 
-export const deleteCategory = async (data: { groupId: GroupId; categoryId: CategoryId }) => {
+const deleteCategory = async (data: { groupId: GroupId; categoryId: CategoryId }) => {
 	const { groupId, categoryId } = data;
 
 	const [gError, group] = await to(fetchGroup(groupId));
@@ -292,7 +294,7 @@ export const deleteCategory = async (data: { groupId: GroupId; categoryId: Categ
 };
 
 // Import data
-export const importGroup = async (data: {
+const importGroup = async (data: {
 	imported: ImportedBackup;
 	newGroupInfo: Pick<Group, 'name' | 'id' | 'paymentTrackingMode'>;
 }) => {
@@ -324,10 +326,35 @@ export const importGroup = async (data: {
 };
 
 // Error logs
-export const createErrorLog = async (error: any) => {
+const createErrorLog = async (error: any) => {
 	const createdAt = dayjs().format('YYYY-MM-DD HH:mm:ss');
 	await supabase.from('error_logs').insert({
 		createdAt,
 		log: { path: window.location.href, ua: navigator.userAgent, error },
 	});
+};
+
+export const supabaseApiClient: IApiClient = {
+	fetchGroups,
+	createGroup,
+	fetchGroup,
+	updateGroup,
+	deleteGroup,
+	addMember,
+	removeMember,
+	updateMember,
+	fetchBills,
+	createBill,
+	updateBill,
+	deleteBill,
+	markBillsAsPaid,
+	deleteCategory,
+	importGroup,
+	createErrorLog,
+};
+
+export const newRealtimeClient = (groupId: GroupId): IRealtimeClient => {
+	return {
+		channel: supabase.channel(groupId) as RealtimeChannel,
+	};
 };

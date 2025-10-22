@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { fetchGroup } from '@/apis/supabase';
 import Button from '@/components/ui/Button.vue';
 import Flex from '@/components/ui/Flex.vue';
 import FormControl from '@/components/ui/FormControl.vue';
 import { PATH } from '@/constants/path';
+import { useApiClient } from '@/hooks/useApiClient';
 import { useToast } from '@/hooks/useToast';
 import { getEnv } from '@/utils/get-env';
 import { veeValidateFocusOnError } from '@/utils/helpers';
@@ -15,9 +15,9 @@ import { z } from 'zod';
 
 const emit = defineEmits<{ close: [] }>();
 
+const client = useApiClient();
 const router = useRouter();
 const toast = useToast();
-
 const schema = z.object({
 	inviteLink: z.string().trim().nonempty('Bắt buộc').default(''),
 });
@@ -47,7 +47,7 @@ const handleJoinGroup = handleSubmit(async ({ inviteLink }) => {
 		groupId = linkOrId.split('/').pop()!;
 	}
 
-	const [error] = await to(fetchGroup(groupId));
+	const [error] = await to(client.fetchGroup(groupId));
 	if (error) return showErrorMessage();
 
 	router.push(PATH.GROUP.replace(':id', groupId));
