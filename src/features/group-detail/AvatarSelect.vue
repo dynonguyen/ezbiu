@@ -1,5 +1,5 @@
 <script lang="ts">
-export const AVT_UPLOADED_PREFIX = '_ezbill_upload_';
+export const AVT_UPLOADED_PREFIX = '_ezbiu_upload_';
 </script>
 
 <script setup lang="ts">

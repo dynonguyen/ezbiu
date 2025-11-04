@@ -1,7 +1,7 @@
 {
-	"name": "Ezbill",
-	"short_name": "Ezbill",
-	"description": "Ezbill is a simple bill splitting app that allows users to split bills with friends and family.",
+	"name": "Ezbiu",
+	"short_name": "Ezbiu",
+	"description": "Ezbiu is a simple bill splitting app that allows users to split bills with friends and family.",
 	"lang": "vi-VN",
 	"orientation": "portrait",
 	"start_url": "/",

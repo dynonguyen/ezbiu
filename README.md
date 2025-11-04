@@ -1,8 +1,8 @@
-# Ezbill
+# Ezbiu
 
-> **[Ezbill](https://ezbill.vercel.app)** is a simple bill splitting app that allows users to split bills with friends and family.
+> **[Ezbiu](https://ezbiu.com)** is a simple bill splitting app that allows users to split bills with friends and family.
 
-> Try now: https://ezbill.vercel.app
+> Try now: https://ezbiu.com
 
 # Demo
 
@@ -37,8 +37,8 @@
 
 # Contributors
 
-<a href="https://github.com/dynonguyen/ezbill/graphs/contributors">
-<img src="https://contrib.rocks/image?repo=dynonguyen/ezbill" height="40" />
+<a href="https://github.com/dynonguyen/ezbiu/graphs/contributors">
+<img src="https://contrib.rocks/image?repo=dynonguyen/ezbiu" height="40" />
 </a>
 
 🎨 Thanks for the design of Nguyen Duc Thien

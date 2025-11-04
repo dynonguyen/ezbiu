@@ -11,7 +11,7 @@ const BASE_URL = process.env.VITE_BASE_URL || '';
 
 const injectData = {
 	baseUrl: BASE_URL,
-	appName: 'Ezbill',
+	appName: 'Ezbiu',
 	releaseDate: new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }),
 };
 

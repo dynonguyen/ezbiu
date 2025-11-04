@@ -1,1 +1,1 @@
-export const APP_NAME = 'Ezbill'
+export const APP_NAME = 'Ezbiu';

@@ -2,6 +2,7 @@
 import Button from '@/components/ui/Button.vue';
 import Flex from '@/components/ui/Flex.vue';
 import Typography from '@/components/ui/Typography.vue';
+import { APP_NAME } from '@/constants/common';
 import JoinGroupPopup from '@/features/join-group/JoinGroupPopup.vue';
 import NewGroupPopup from '@/features/new-group/NewGroupPopup.vue';
 import RecentGroups from '@/features/recent-groups/RecentGroups.vue';
@@ -13,7 +14,7 @@ const openJoinGroup = ref(false);
 
 <template>
 	<div class="rounded-b-[32px] bg-white p-4">
-		<h1 class="text-2xl font-black text-center py-2.5">EZbill</h1>
+		<h1 class="text-2xl font-black text-center py-2.5">{{ APP_NAME }}</h1>
 
 		<Flex class="mt-6 gap-2">
 			<Button shape="pill" :class="$style['action-btn']" @click="openNewGroup = true">
